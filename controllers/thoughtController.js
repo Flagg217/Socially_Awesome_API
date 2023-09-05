@@ -3,73 +3,72 @@ const { Thought, User } = require('../models');
 module.exports = {
   // Get all thoughts
   getAllThoughts(req, res) {
-    Course.find()
-      .then((courses) => res.json(courses))
+    Thought.find()
+      .then((thoughts) => res.json(thoughts))
       .catch((err) => res.status(500).json(err));
   },
   // Get a thought
   getThought(req, res) {
-    Course.findOne({ _id: req.params.courseId })
+    Thought.findOne({ _id: req.params.thoughtId })
       .select('-__v')
-      .then((course) =>
-        !course
-          ? res.status(404).json({ message: 'No course with that ID' })
-          : res.json(course)
-      )
+      .then((thoughts) => res.json(thoughts))
       .catch((err) => res.status(500).json(err));
   },
   // Create a thought
-  createThought(req, res) {
-    Course.create(req.body)
-      .then((course) => res.json(course))
+  async createThought(req, res) {
+    try {
+      const newThought = await Thought.create(req.body);
+      if (newThought) {
+        await User.findOneAndUpdate({_id: req.body.userId}, {$addToSet: {thoughts: newThought._id}}, { new: true });
+      }
+      return res.json("Thought created!")
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+  // Delete a thought
+  deleteThought(req, res) {
+    thought.findOneAndDelete({ _id: req.params.thoughtId })
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with that ID' })
+          : Student.deleteMany({ _id: { $in: thought.students } })
+      )
+      .then(() => res.json({ message: 'Thought and students deleted!' }))
+      .catch((err) => res.status(500).json(err));
+  },
+  // Update a thought
+  updateThought(req, res) {
+    Thought.findOneAndUpdate(
+      { _id: req.params.thoughtId },
+      { $set: req.body },
+      { runValidators: true, new: true }
+    )
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with this id!' })
+          : res.json(thought)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+
+  createReaction(req, res) {
+    Thought.create(req.body)
+      .then((thought) => res.json(thought))
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
       });
   },
   // Delete a thought
-  deleteThought(req, res) {
-    Course.findOneAndDelete({ _id: req.params.courseId })
-      .then((course) =>
-        !course
-          ? res.status(404).json({ message: 'No course with that ID' })
-          : Student.deleteMany({ _id: { $in: course.students } })
-      )
-      .then(() => res.json({ message: 'Course and students deleted!' }))
-      .catch((err) => res.status(500).json(err));
-  },
-  // Update a course
-  updateThought(req, res) {
-    Course.findOneAndUpdate(
-      { _id: req.params.courseId },
-      { $set: req.body },
-      { runValidators: true, new: true }
-    )
-      .then((course) =>
-        !course
-          ? res.status(404).json({ message: 'No course with this id!' })
-          : res.json(course)
-      )
-      .catch((err) => res.status(500).json(err));
-  },
-
-  createReaction(req, res) {
-    Course.create(req.body)
-      .then((course) => res.json(course))
-      .catch((err) => {
-        console.log(err);
-        return res.status(500).json(err);
-      });
-  },
-  // Delete a course
   deleteReaction(req, res) {
-    Course.findOneAndDelete({ _id: req.params.courseId })
-      .then((course) =>
-        !course
-          ? res.status(404).json({ message: 'No course with that ID' })
-          : Student.deleteMany({ _id: { $in: course.students } })
+    Thought.findOneAndDelete({ _id: req.params.thoughtId })
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with that ID' })
+          : Student.deleteMany({ _id: { $in: thought.students } })
       )
-      .then(() => res.json({ message: 'Course and students deleted!' }))
+      .then(() => res.json({ message: 'Thought and students deleted!' }))
       .catch((err) => res.status(500).json(err));
   },
 };

@@ -3,9 +3,9 @@ const { User, Thought } = require('../models');
 const { create } = require('../models/User');
 
 module.exports = {
-  // Get all students
+  // Get all users
   getAllUsers(req, res) {
-    User.find()
+    User.find().populate('thoughts').populate('friends')
       .then((users) => {
       return res.json(users);
       })
@@ -14,7 +14,7 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
-  // Get a single student
+  // Get a single user
   getUser(req, res) {
     User.findOne({ _id: req.params.UserId })
       .then((users) => {
@@ -25,22 +25,23 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
-  // create a new student
+  // create a new user
   createUser(req, res) {
     User.create(req.body)
       .then((user) => res.json(user))
       .catch((err) => res.status(500).json(err));
   },
 
-  updateUser(req, res) {
+  updateUser (req, res) {
     User.findOneAndUpdate(
-      { _id: req.params.userId },
-      { $set: req.body },
-      { runValidators: true, new: true }
+      { _id: req.params.UserId }, req.body, { new: true, runValidators: true }
     )
-      .then((user) => res.json(user))
+      .then((user) => {
+        
+        return res.json(user);
+      })
       .catch((err) => res.status(500).json(err));
-  },
+    },
   // Delete a user and remove them from the course
   deleteUser(req, res) {
     User.findOneAndRemove({ _id: req.params.UserId })
@@ -48,7 +49,7 @@ module.exports = {
     .catch((err) => res.status(500).json(err));
   },
 
-  // Add an assignment to a student
+  // Add an friend to a user
   addFriend(req, res) {
     console.log('You are adding a friend');
     console.log(req.body);
@@ -60,7 +61,7 @@ module.exports = {
     .then((user) => res.json(user))
     .catch((err) => res.status(500).json(err));
   },
-  // Remove assignment from a student
+  // Remove friend from a user
   removeFriend(req, res) {
     console.log('You are removing a friend');
     User.findOneAndUpdate(
@@ -71,7 +72,7 @@ module.exports = {
     .then((user) => {
       res.json(user);
       console.log("testing");
-      })
+    })
     .catch((err) => res.status(500).json(err));
   },
 };
