@@ -1,18 +1,18 @@
 const { ObjectId } = require('mongoose').Types;
-const { User, Thought } = require('../models');
+const { User } = require('../models');
 const { create } = require('../models/User');
 
 module.exports = {
   // Get all users
   getAllUsers(req, res) {
-    User.find().populate('thoughts').populate('friends')
-      .then((users) => {
+    User.find()
+    .then((users) => {
       return res.json(users);
-      })
-      .catch((err) => {
-        console.log(err);
-        return res.status(500).json(err);
-      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json(err);
+    });
   },
   // Get a single user
   getUser(req, res) {
