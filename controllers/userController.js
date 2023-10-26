@@ -71,10 +71,7 @@ module.exports = {
       { $pull: { friends: req.params.friendId } },
       { runValidators: true, new: true }
     )
-    .then((user) => {
-      res.json(user);
-      console.log("testing");
-    })
+    .then((user) => res.json(user))
     .catch((err) => res.status(500).json(err));
   },
 };
