@@ -17,9 +17,11 @@ module.exports = {
   // Get a single user
   getUser(req, res) {
     User.findOne({ _id: req.params.UserId })
+      .populate("thoughts")
+      .populate("friends")
       .then((users) => {
         return res.json(users);
-       })
+      })
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
