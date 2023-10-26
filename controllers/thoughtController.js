@@ -72,16 +72,23 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-  // Delete a thought
-  deleteReaction(req, res) {
-    Thought.findOneAndDelete({ _id: req.params.thoughtId })
-      .then((thought) =>
-        !thought
-          ? res.status(404).json({ message: 'No thought with that ID' })
-          : Student.deleteMany({ _id: { $in: thought.students } })
-      )
-      .then(() => res.json({ message: 'Thought and students deleted!' }))
-      .catch((err) => res.status(500).json(err));
-  },
-};
+
+  async deleteReaction(req, res) {
+    try {
+      const removeReaction = await Thought.findOneAndUpdate({
+        _id: req.params.thoughtId,
+      });
+      if (removeReation) {
+        await Thought.findOneAndUpdate(
+          { _id: req.params.thoughtId },
+          { $pull: { reactions: { reactionId: req.params.reactionId } } },
+          { new: true }
+        );
+      }
+      res.json("Reaction removed!");
+      } catch (err) {
+        res.status(500).json(err);
+      }
+    },
+  };
 
