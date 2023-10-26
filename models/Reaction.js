@@ -1,4 +1,5 @@
 const { Schema, Types } = require('mongoose');
+const formatDate = require('../utils/formatDate');
 
 const reactionSchema = new Schema(
   {
@@ -6,19 +7,16 @@ const reactionSchema = new Schema(
       type: Schema.Types.ObjectId,
       default: () => new Types.ObjectId(),
     },
-    reactionName: {
+    reactionBody: {
       type: String,
       required: true,
       maxlength: 280,
-      
+      minlength: 10,
     },
     username: {
-      type: String,
-      required: true,
-    },
-    createdAt: {
       type: Date,
       default: Date.now,
+      get: (date) => formatDate(date),
     },
   },
   {
